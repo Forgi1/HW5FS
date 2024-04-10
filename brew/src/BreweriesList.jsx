@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './App.css'
+import { Link } from 'react-router-dom';
+import BreweriesChart from './BreweriesChart';
 const BreweriesList = () => {
     const [breweries, setBreweries] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
@@ -33,6 +35,14 @@ const BreweriesList = () => {
       return matchesSearchTerm && matchesFilters;
     });
   
+    const chartData = filteredBreweries.reduce((acc, brewery) => {
+      const { state } = brewery;
+      if (state) { // Some breweries might not have a state defined
+          acc[state] = (acc[state] || 0) + 1;
+      }
+      return acc;
+  }, {});
+
     return (
       <div className="breweries-list">
         <h1>Brews Room</h1>
@@ -76,7 +86,7 @@ const BreweriesList = () => {
         <ul>
           {filteredBreweries.map(brewery => (
             <li key={brewery.id}>
-              <h2>{brewery.name}</h2>
+              <Link to={`/brewery/${brewery.id}`}>{brewery.name}</Link>
               <p>Type: {brewery.brewery_type}</p>
               <p>Address: {brewery.street}, {brewery.city}, {brewery.state_province}, {brewery.postal_code}</p>
               <p>Phone: {brewery.phone}</p>
@@ -84,6 +94,7 @@ const BreweriesList = () => {
             </li>
           ))}
         </ul>
+        <BreweriesChart data={chartData} />
       </div>
     );
   };
